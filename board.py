@@ -23,6 +23,7 @@ class Board:
         self.movement_direction.setdefault("down-left", (1, -1))
         self.movement_direction.setdefault("down-right", (1, 1))
         self.possible_directions = self.movement_direction.keys()
+        self._direction_to_arrow = {'N': '^', 'S': 'v', 'E': '>', 'W': '<'}
 
     def __repr__(self):
         return str(self)
@@ -34,8 +35,8 @@ class Board:
         return s
 
     def plot(self):
-
         primate_xs, primate_ys = [], []
+        primate_labels = []
         stick_xs, stick_ys = [], []
         egg_xs, egg_ys = [], []
 
@@ -44,6 +45,12 @@ class Board:
                 if isinstance(self.board[j][i], primate.Primate):
                     primate_xs.append(i)
                     primate_ys.append(j)
+                    arrow_label = self._direction_to_arrow[self.board[j][i].direction]
+                    if self.board[j][i].egg:
+                        arrow_label += 'o'
+                    elif self.board[j][i].stick:
+                        arrow_label += '/'
+                    primate_labels.append(arrow_label)
                 elif isinstance(self.board[j][i], egg.Egg):
                     egg_xs.append(i)
                     egg_ys.append(j)
@@ -51,10 +58,14 @@ class Board:
                     stick_xs.append(i)
                     stick_ys.append(j)
 
-        plt.scatter(primate_xs, primate_ys, alpha=0.5)
-        plt.scatter(stick_xs, stick_ys, color='red', alpha=0.5)
-        plt.scatter(egg_xs, egg_ys, alpha=1)
+        plt.rcParams['axes.facecolor'] = (0, 0.3, 0.1)
+        plt.scatter(primate_xs, primate_ys, s=200, color='brown', alpha=1.0)
+        for i in range(len(primate_xs)):
+            plt.annotate(primate_labels[i], (primate_xs[i], primate_ys[i]))
+        plt.scatter(stick_xs, stick_ys, color='red', marker='_', s=100, alpha=1)
+        plt.scatter(egg_xs, egg_ys, color='yellow', marker='o', alpha=1)
         axes = plt.gca()
+        axes.grid(True)
         axes.set_xlim([-1, self.n + 1])
         axes.set_ylim([-1, self.m + 1])
         plt.show()
@@ -153,6 +164,7 @@ class Board:
         if obj in self.objects_position:
             return self.objects_position[obj]
         return None
+
 
 def main():
     board = Board(n=4, m=5)

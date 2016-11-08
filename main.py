@@ -36,9 +36,9 @@ def main():
     main_board = board.Board(4, 5)
 
     # Random Initialization
-    primates = [primate.Primate() for idx in range(0, 3)]
-    eggs = [egg.Egg() for idx in range(0, 2)]
-    sticks = [stick.Stick() for idx in range(0, 1)]
+    primates = [primate.Primate() for idx in range(3)]
+    eggs = [egg.Egg() for idx in range(2)]
+    sticks = [stick.Stick() for idx in range(1)]
 
     # primates = [primate.Primate()]
 
