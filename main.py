@@ -11,10 +11,12 @@ def kill_primate(main_board, primate, primates):
 
 
 def run_simulation(main_board, primates, sticks, eggs):
+    main_board.plot()
+    main_board.time_step += 1
     while len(primates) > 0:
-        print "inspecting primates list"
+        # print "inspecting primates list"
         for primate in primates:
-            print "doing primate by primate work"
+            # print "doing primate by primate work"
             objects_near_primate = primate.sense_objects(main_board)
             for obj, cell in objects_near_primate.iteritems():
                 if primate.pickup_object(main_board, cell[0], cell[1], obj):
@@ -27,13 +29,14 @@ def run_simulation(main_board, primates, sticks, eggs):
             else:
                 primate.decrement_hp()
                 main_board.move_object_randomly(primate)
-            print main_board
+            # print main_board
             main_board.plot()
-            print "=============================================="
+            # print "=============================================="
+        main_board.time_step += 1
 
 
 def main():
-    main_board = board.Board(4, 5)
+    main_board = board.Board(25, 25)
 
     # Random Initialization
     primates = [primate.Primate() for idx in range(3)]

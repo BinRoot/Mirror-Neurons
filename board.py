@@ -1,10 +1,13 @@
 import random
 
+from matplotlib.ticker import MultipleLocator
+
 import egg
 import primate
 import stick
 
 import matplotlib.pyplot as plt
+import time, os
 
 class Board:
     def __init__(self, n=10, m=10, empty_square=None, objects=[]):
@@ -24,6 +27,13 @@ class Board:
         self.movement_direction.setdefault("down-right", (1, 1))
         self.possible_directions = self.movement_direction.keys()
         self._direction_to_arrow = {'N': '^', 'S': 'v', 'E': '>', 'W': '<'}
+        self.plot_dir = 'plots_{}'.format(int(time.time()))
+        self._mkdir(self.plot_dir)
+        self.time_step = 0
+
+    def _mkdir(self, directory):
+        if not os.path.exists(directory):
+            os.makedirs(directory)
 
     def __repr__(self):
         return str(self)
@@ -45,7 +55,7 @@ class Board:
                 if isinstance(self.board[j][i], primate.Primate):
                     primate_xs.append(i)
                     primate_ys.append(j)
-                    arrow_label = self._direction_to_arrow[self.board[j][i].direction]
+                    arrow_label = ''
                     if self.board[j][i].egg:
                         arrow_label += 'o'
                     elif self.board[j][i].stick:
@@ -64,11 +74,20 @@ class Board:
             plt.annotate(primate_labels[i], (primate_xs[i], primate_ys[i]))
         plt.scatter(stick_xs, stick_ys, color='red', marker='_', s=100, alpha=1)
         plt.scatter(egg_xs, egg_ys, color='yellow', marker='o', alpha=1)
+
         axes = plt.gca()
-        axes.grid(True)
+
+        spacing = 1. # This can be your user specified spacing.
+        minorLocator = MultipleLocator(spacing)
+        axes.yaxis.set_minor_locator(minorLocator)
+        axes.xaxis.set_minor_locator(minorLocator)
+
+        axes.grid(True, which='minor')
         axes.set_xlim([-1, self.n + 1])
         axes.set_ylim([-1, self.m + 1])
-        plt.show()
+        plt.savefig('{}/{}.png'.format(self.plot_dir, self.time_step))
+        plt.clf()
+        # plt.show()
 
     def rand_init(self, objects):
         if len(objects) > self.n * self.m:
