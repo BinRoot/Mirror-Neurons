@@ -7,7 +7,8 @@ import primate
 import stick
 
 import matplotlib.pyplot as plt
-import time, os
+import time, os, math
+
 
 class Board:
     def __init__(self, n=10, m=10, empty_square=None, objects=[]):
@@ -44,6 +45,37 @@ class Board:
             s = "{}\n{}".format(s, row)
         return s
 
+    def direction_to_closest(self, primate, module_name):
+        px, py = self.objects_position[primate]
+        print('looking for closest {} to primate at {}, {}'.format(module_name, px, py))
+        closest_dist = float('inf')
+        closest_loc = (None, None)
+        for i in range(self.n):
+            for j in range(self.m):
+                if self.board[j][i] and self.board[j][i].__module__ == module_name:
+                    dist = math.sqrt(math.pow(px - j, 2) + math.pow(py - i, 2))
+                    if dist < closest_dist:
+                        closest_dist = dist
+                        closest_loc = (j, i)
+        print('closest {} is {}'.format(module_name, closest_loc))
+        direction = (closest_loc[0] - px, closest_loc[1] - py)
+        print('in the direction of {}'.format(direction))
+        # A = direction
+        # B = (dx, dy)
+        best_direction = None
+        best_cosdist = float('inf')
+        for direction_name, (dx, dy) in self.movement_direction.items():
+            dotproduct = dx * direction[0] + dy * direction[1]
+            magA = math.sqrt(math.pow(direction[0], 2) + math.pow(direction[1], 2))
+            magB = math.sqrt(math.pow(dx, 2) + math.pow(dy, 2))
+            cosdist = dotproduct / (magA * magB)
+            if abs(cosdist - 1) < abs(best_cosdist - 1):
+                best_cosdist = cosdist
+                best_direction = direction_name
+        print('best direction is {}'.format(best_direction))
+        return best_direction
+
+
     def plot(self):
         primate_xs, primate_ys = [], []
         primate_labels = []
@@ -55,10 +87,10 @@ class Board:
                 if isinstance(self.board[j][i], primate.Primate):
                     primate_xs.append(i)
                     primate_ys.append(j)
-                    arrow_label = ''
+                    arrow_label = self.board[j][i].name
                     if self.board[j][i].egg:
                         arrow_label += 'o'
-                    elif self.board[j][i].stick:
+                    if self.board[j][i].stick:
                         arrow_label += '/'
                     primate_labels.append(arrow_label)
                 elif isinstance(self.board[j][i], egg.Egg):
@@ -68,12 +100,12 @@ class Board:
                     stick_xs.append(i)
                     stick_ys.append(j)
 
-        plt.rcParams['axes.facecolor'] = (0, 0.3, 0.1)
-        plt.scatter(primate_xs, primate_ys, s=200, color='brown', alpha=1.0)
+        plt.rcParams['axes.facecolor'] = (31 / 255., 138 / 255., 112 / 255.)
+        plt.scatter(primate_xs, primate_ys, s=200, color='#FD7400', alpha=1.0)
         for i in range(len(primate_xs)):
             plt.annotate(primate_labels[i], (primate_xs[i], primate_ys[i]))
-        plt.scatter(stick_xs, stick_ys, color='red', marker='_', s=100, alpha=1)
-        plt.scatter(egg_xs, egg_ys, color='yellow', marker='o', alpha=1)
+        plt.scatter(stick_xs, stick_ys, color='#004358', marker='$/$', s=100, alpha=1)
+        plt.scatter(egg_xs, egg_ys, color='#FFE11A', marker='o', alpha=1)
 
         axes = plt.gca()
 
@@ -86,8 +118,8 @@ class Board:
         axes.set_xlim([-1, self.n + 1])
         axes.set_ylim([-1, self.m + 1])
         plt.savefig('{}/{}.png'.format(self.plot_dir, self.time_step))
-        plt.clf()
         # plt.show()
+        plt.clf()
 
     def rand_init(self, objects):
         if len(objects) > self.n * self.m:

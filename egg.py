@@ -1,5 +1,5 @@
 class Egg:
-    def __init__(self, max_hits=5, regular_damage=2, stick_damage=3):
+    def __init__(self, max_hits=10, regular_damage=2, stick_damage=5):
         self.max_hits = max_hits
         self.HP = max_hits
         if stick_damage < regular_damage:

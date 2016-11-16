@@ -1,10 +1,11 @@
 class Primate:
-    def __init__(self, maximum_health=20, health_decay_per_move=1, health_recovered_from_food=5):
+    def __init__(self, name='', maximum_health=20, health_decay_per_move=1, health_recovered_from_food=5):
         self.directions = ['N', 'E', 'S', 'W']
         self.direction_idx = 0
         self.direction = self.directions[self.direction_idx]
         self.egg = None
         self.stick = None
+        self.name = name
         self.max_hp = maximum_health
         self.hp = maximum_health
         self.health_decay_per_move = health_decay_per_move

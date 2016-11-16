@@ -29,6 +29,21 @@ def run_simulation(main_board, primates, sticks, eggs):
             else:
                 primate.decrement_hp()
                 main_board.move_object_randomly(primate)
+
+                # if primate not holding a stick: move to direction of closest stick
+                # if primate is holding stick: move to direction of closest egg
+
+                # if primate.stick is None:
+                #     # move to direction of closest stick
+                #     direction = main_board.direction_to_closest(primate, stick.Stick.__module__)
+                #     if direction is not None:
+                #         main_board.move_object_in_direction(primate, direction)
+                # else:
+                #     # move to direction of closest egg
+                #     direction = main_board.direction_to_closest(primate, egg.Egg.__module__)
+                #     if direction is not None:
+                #         main_board.move_object_in_direction(primate, direction)
+
             # print main_board
             main_board.plot()
             # print "=============================================="
@@ -36,12 +51,12 @@ def run_simulation(main_board, primates, sticks, eggs):
 
 
 def main():
-    main_board = board.Board(25, 25)
+    main_board = board.Board(10, 10)
 
     # Random Initialization
-    primates = [primate.Primate() for idx in range(3)]
+    primates = [primate.Primate(name=str(idx)) for idx in range(1)]
     eggs = [egg.Egg() for idx in range(2)]
-    sticks = [stick.Stick() for idx in range(1)]
+    sticks = [stick.Stick() for idx in range(2)]
 
     # primates = [primate.Primate()]
 
