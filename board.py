@@ -8,6 +8,8 @@ import stick
 
 import matplotlib.pyplot as plt
 import time, os, math
+import numpy as np
+from scipy.misc import imsave
 
 
 class Board:
@@ -75,6 +77,16 @@ class Board:
         print('best direction is {}'.format(best_direction))
         return best_direction
 
+    def distance_to_closest(self, primate, module_name):
+        px, py = self.objects_position[primate]
+        closest_dist = float('inf')
+        for i in range(self.n):
+            for j in range(self.m):
+                if self.board[j][i] and self.board[j][i].__module__ == module_name:
+                    dist = math.sqrt(math.pow(px - j, 2) + math.pow(py - i, 2))
+                    if dist < closest_dist:
+                        closest_dist = dist
+        return closest_dist
 
     def plot(self):
         primate_xs, primate_ys = [], []
@@ -117,9 +129,33 @@ class Board:
         axes.grid(True, which='minor')
         axes.set_xlim([-1, self.n + 1])
         axes.set_ylim([-1, self.m + 1])
-        plt.savefig('{}/{}.png'.format(self.plot_dir, self.time_step))
+        # plt.savefig('{}/{}.png'.format(self.plot_dir, self.time_step))
         # plt.show()
         plt.clf()
+
+        # img = self.get_img_for_nn()
+        # imsave('{}/{}_simple.png'.format(self.plot_dir, self.time_step), img)
+        # np.save('{}/{}.npy'.format(self.plot_dir, self.time_step), img)
+        # np.savetxt('{}/{}_txt.txt'.format(self.plot_dir, self.time_step), img)
+
+    def get_img_for_nn(self):
+        img = np.ones((self.m, self.n))
+        for i in range(self.n):
+            for j in range(self.m):
+                if isinstance(self.board[j][i], primate.Primate):
+                    if self.board[j][i].egg and self.board[j][i].stick:
+                        img[j, i] = 127
+                    elif self.board[j][i].egg:
+                        img[j, i] = 31
+                    elif self.board[j][i].stick:
+                        img[j, i] = 63
+                    else:
+                        img[j, i] = 3
+                elif isinstance(self.board[j][i], egg.Egg):
+                    img[j, i] = 7
+                elif isinstance(self.board[j][i], stick.Stick):
+                    img[j, i] = 15
+        return img
 
     def rand_init(self, objects):
         if len(objects) > self.n * self.m:
